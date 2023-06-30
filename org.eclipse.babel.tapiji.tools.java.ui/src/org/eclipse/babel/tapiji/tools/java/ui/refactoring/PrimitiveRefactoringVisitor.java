@@ -184,10 +184,16 @@ public class PrimitiveRefactoringVisitor extends ASTVisitor {
             if (node.getExpression() instanceof SimpleName
                     && varNameOfBundle.equals(node.getExpression().toString())) {
 
-                // is the parameter the old key?
-                StringLiteral literal = (StringLiteral) node.arguments().get(0);
+            	// is the parameter the old key?
+            	Object arg = node.arguments().get(0);
+            	String parameter = null;
 
-                if (oldKey.equals(literal.getLiteralValue())) {
+            	if ( arg instanceof StringLiteral ) {
+            		StringLiteral stringLiteral = (StringLiteral)arg;
+            		parameter = stringLiteral.getLiteralValue();
+            	}
+
+            	if (oldKey.equals(parameter)) {
 
                     // ASTRewrite
                     Expression exp = (Expression) rewriter
@@ -242,9 +248,19 @@ public class PrimitiveRefactoringVisitor extends ASTVisitor {
 
             // what's the name of the variable of the target res. bundle?
             for (Object arg : method.arguments()) {
-                if (arg instanceof StringLiteral
-                        && resourceBundleId.equals(((StringLiteral) arg)
-                                .getLiteralValue())) {
+            	String bundleId = null;
+            	if ( arg instanceof SimpleName ) {
+            		SimpleName simpleName = (SimpleName)arg;
+            		Object result = simpleName.resolveConstantExpressionValue();
+            		if ( result instanceof String ) {
+            			bundleId = (String)result;
+            		}
+            	} else if ( arg instanceof StringLiteral ) {
+            		StringLiteral stringLiteral = (StringLiteral)arg;
+            		bundleId = stringLiteral.getLiteralValue();
+            	}
+
+            	if ( bundleId != null && resourceBundleId.equals(bundleId)) {
                     return vdf.getName().toString();
                 }
             }

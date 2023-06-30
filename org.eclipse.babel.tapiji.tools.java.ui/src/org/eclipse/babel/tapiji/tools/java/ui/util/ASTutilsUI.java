@@ -294,6 +294,9 @@ public class ASTutilsUI {
 						ImportDeclaration imp = (ImportDeclaration) obj;
 						String importName = imp.getName().toString();
 						if ("java.util.ResourceBundle".equals(importName)) {
+							/* TODO : CR: To support the "Message accessor" pattern we need to find which methods that access the resource bundle as well and refactor the callers of them.
+							 * Now, we are only refactoring direct access to the resource bundle
+							*/
 							PrimitiveRefactoringVisitor prv = new PrimitiveRefactoringVisitor(
 									cu, resourceBundleId, oldKey, newKey,
 									changeSet);
